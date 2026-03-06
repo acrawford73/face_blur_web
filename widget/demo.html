@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Face Blur Widget – Demo</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 640px; margin: 2rem auto; padding: 0 1rem; }
+    h1 { font-size: 1.25rem; }
+    p { color: #444; }
+    img { max-width: 100%; height: auto; display: block; margin: 1rem 0; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h1>Face Blur Widget – Demo</h1>
+  <p>Images below will have faces detected and blurred when the page loads (images only, no video).</p>
+  <p>Use a photo with clear faces for best results. Same-origin or CORS-enabled images only.</p>
+
+  <!-- Use a placeholder that allows hotlinking, or replace with your own image URL -->
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Group_portrait.jpg/640px-Group_portrait.jpg" alt="Group" width="640">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/People_at_Faneuil_Hall.jpg/640px-People_at_Faneuil_Hall.jpg" alt="People" width="640">
+
+  <!-- Widget: loads face-api if needed, then blurs faces in all images -->
+  <script src="face-blur-widget.js"></script>
+</body>
+</html>

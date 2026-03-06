@@ -1,0 +1,12 @@
+{
+  "name": "face-blur-web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "postinstall": "node scripts/copy-face-api.js",
+    "prepare:extension": "node scripts/copy-face-api.js"
+  },
+  "devDependencies": {
+    "@vladmandic/face-api": "^1.7.15"
+  }
+}
