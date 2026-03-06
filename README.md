@@ -101,6 +101,12 @@ npm install
 
 ---
 
+## Disclaimer
+
+This experimental project was built using Cursor. There may be issues or errors.
+
+---
+
 ## License
 
 MIT.
