@@ -13,18 +13,26 @@ Both use [@vladmandic/face-api](https://github.com/vladmandic/face-api) (Tiny Fa
 
 Blur faces in images on any page you visit.
 
-### Setup
+### Extension only (no npm)
 
-1. Install dependencies and copy the face-api build into the extension:
+If you only want the extension and don’t need to change the code or rebuild:
+
+1. Use the **`extension`** folder as-is (it already includes `face-api.js`).
+2. In Chrome: open **`chrome://extensions/`** → turn on **Developer mode** → **Load unpacked** → select the `extension` folder.
+
+No npm or build step required. You can copy or download just the `extension` folder and load it.
+
+### Setup from source (developers)
+
+If you’re cloning the repo or need to refresh the face-api dependency:
+
+1. In the project root, run:
    ```bash
    npm install
    ```
-   This runs a postinstall script that copies `face-api.js` from `node_modules` to `extension/`.
+   This copies `face-api.js` from `node_modules` into `extension/`.
 
-2. Load the extension in Chrome:
-   - Open `chrome://extensions/`
-   - Turn on **Developer mode**
-   - Click **Load unpacked** and choose the `extension` folder
+2. Load the extension in Chrome as above (Load unpacked → select the `extension` folder).
 
 ### Behavior
 
@@ -86,10 +94,10 @@ npx serve .
 
 ## Project layout
 
-- **extension/** – Chrome extension (Manifest V3)
+- **extension/** – Chrome extension (Manifest V3). Self-contained; use this folder alone to load the extension.
   - `manifest.json`, `background.js`, `content.js`
   - `shared/face-blur.js` – shared blur logic
-  - `face-api.js` – copied by `npm run prepare:extension` / postinstall
+  - `face-api.js` – included so the extension works without running npm
 - **widget/** – Embeddable script
   - `face-blur-widget.js` – single-file widget
   - `demo.html` – demo page
@@ -97,9 +105,9 @@ npx serve .
 
 ---
 
-## Rebuilding the extension
+## Rebuilding / updating the extension
 
-After changing dependencies or if `extension/face-api.js` is missing:
+Only needed if you’re developing or updating the face-api dependency. If `extension/face-api.js` is missing or you want to refresh it:
 
 ```bash
 npm run prepare:extension
