@@ -8,10 +8,18 @@
  *
  * Or load this script (it will load face-api automatically):
  *   <script src="path/to/face-blur-widget.js" data-auto-load></script>
+ *
+ * Optional: set blur strength (default 16) via data-blur-pixels:
+ *   <script src="path/to/face-blur-widget.js" data-blur-pixels="24"></script>
  */
 (function () {
+  var script = document.currentScript;
+  var blurPixels = 16;
+  if (script && script.getAttribute('data-blur-pixels')) {
+    var n = parseInt(script.getAttribute('data-blur-pixels'), 10);
+    if (!isNaN(n) && n > 0) blurPixels = n;
+  }
   var MODEL_BASE = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.15/model';
-  var BLUR_PIXELS = 16;
   var BOX_PADDING = 0.15;
   var FACE_API_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.15/dist/face-api.js';
 
@@ -66,7 +74,7 @@
       blurCanvas.width = bw;
       blurCanvas.height = bh;
       blurCtx.drawImage(canvas, x, y, bw, bh, 0, 0, bw, bh);
-      blurCtx.filter = 'blur(' + BLUR_PIXELS + 'px)';
+      blurCtx.filter = 'blur(' + blurPixels + 'px)';
       blurCtx.drawImage(blurCanvas, 0, 0, bw, bh, 0, 0, bw, bh);
       blurCtx.filter = 'none';
       ctx.drawImage(blurCanvas, 0, 0, bw, bh, x, y, bw, bh);

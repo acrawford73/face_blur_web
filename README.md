@@ -59,6 +59,14 @@ The script will:
 2. Load the Tiny Face Detector model.
 3. Find all `<img>` elements and blur detected faces (and watch for new images).
 
+**Adjust blur strength (widget):** use the `data-blur-pixels` attribute on the script tag (default is 16; higher = stronger blur):
+
+```html
+<script src="path/to/face-blur-widget.js" data-blur-pixels="24"></script>
+```
+
+**Adjust blur (extension):** edit `extension/shared/face-blur.js` and change the `BLUR_PIXELS` constant (default 16).
+
 ### Limitations (widget)
 
 - **CORS**: Drawing an image to canvas and reading pixels requires the image to be same-origin or served with CORS headers. Cross-origin images without CORS will not be processable; the widget will skip them.
