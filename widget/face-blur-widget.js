@@ -120,8 +120,6 @@
 
   function init() {
     ensureModelLoaded().then(run);
-  }
-
     var observer = new MutationObserver(run);
     if (document.body) {
       observer.observe(document.body, { childList: true, subtree: true });
