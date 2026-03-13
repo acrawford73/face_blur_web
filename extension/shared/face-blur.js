@@ -5,7 +5,7 @@
  */
 (function () {
   const MODEL_BASE = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.15/model';
-  const BLUR_PIXELS = 16;
+  const BLUR_PIXELS = 32;
   const BOX_PADDING = 0.15;
 
   let modelLoaded = false;
@@ -72,12 +72,23 @@
       canvas.height = img.naturalHeight;
       var ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0);
-      return faceapi.detectAllFaces(canvas, new faceapi.TinyFaceDetectorOptions({
+      var opts = new faceapi.TinyFaceDetectorOptions({
         inputSize: 224,
         scoreThreshold: 0.5
-      })).then(function (detections) {
+      });
+      return faceapi.detectAllFaces(canvas, opts).then(function (detections) {
         blurRegions(canvas, detections);
-        return canvas.toDataURL('image/png');
+        var dataUrl = canvas.toDataURL('image/png');
+        if (typeof faceapi !== 'undefined' && faceapi.tf) {
+          try {
+            if (typeof faceapi.tf.disposeVariables === 'function') faceapi.tf.disposeVariables();
+            else if (faceapi.tf.engine && typeof faceapi.tf.engine === 'function') {
+              var eng = faceapi.tf.engine();
+              if (eng && typeof eng.disposeVariables === 'function') eng.disposeVariables();
+            }
+          } catch (e) {}
+        }
+        return dataUrl;
       });
     });
   }

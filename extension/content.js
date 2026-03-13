@@ -1,9 +1,14 @@
 (function () {
+  function isExtensionContextValid() {
+    try { return !!chrome.runtime?.id; } catch (e) { return false; }
+  }
   function processWithBlobUrl(img, blobUrl) {
     var imgEl = new Image();
     return new Promise(function (resolve) {
       imgEl.onload = function () {
+        if (!isExtensionContextValid()) { if (blobUrl) URL.revokeObjectURL(blobUrl); resolve(); return; }
         window.FaceBlur.processImageToDataURL(imgEl).then(function (dataUrl) {
+          if (!isExtensionContextValid()) return;
           img.src = dataUrl;
           img.setAttribute('data-face-blur-done', '1');
           if (blobUrl) URL.revokeObjectURL(blobUrl);
@@ -24,31 +29,59 @@
   function processOneImage(img) {
     var src = img.src || img.currentSrc;
     if (!src || src.startsWith('data:')) return Promise.resolve();
+    if (!isExtensionContextValid()) return Promise.resolve();
 
     return new Promise(function (resolve) {
-      chrome.runtime.sendMessage({ type: 'FETCH_IMAGE', url: src }, function (response) {
-        if (chrome.runtime.lastError) {
-          tryFallback();
-          return;
-        }
-        if (response && response.ok && response.buffer && response.buffer.byteLength > 0) {
-          var blob = new Blob([response.buffer], { type: 'image/*' });
-          var blobUrl = URL.createObjectURL(blob);
-          processWithBlobUrl(img, blobUrl).then(resolve);
-          return;
-        }
-        tryFallback();
-        function tryFallback() {
-          window.FaceBlur.processImageToDataURL(img).then(function (dataUrl) {
-            img.src = dataUrl;
-            img.setAttribute('data-face-blur-done', '1');
-          }).catch(function () { }).then(resolve);
-        }
-      });
+      var sent;
+      try {
+        sent = chrome.runtime.sendMessage({ type: 'FETCH_IMAGE', url: src }, function (response) {
+          try {
+            if (!isExtensionContextValid()) {
+              resolve();
+              return;
+            }
+            if (chrome.runtime.lastError) {
+              tryFallback();
+              return;
+            }
+            if (response && response.ok && response.buffer && response.buffer.byteLength > 0) {
+              var blob = new Blob([response.buffer], { type: 'image/*' });
+              var blobUrl = URL.createObjectURL(blob);
+              processWithBlobUrl(img, blobUrl).then(resolve).catch(function () { resolve(); });
+              return;
+            }
+            tryFallback();
+          } catch (e) {
+            resolve();
+            return;
+          }
+          function tryFallback() {
+            try {
+              if (!isExtensionContextValid()) { resolve(); return; }
+              window.FaceBlur.processImageToDataURL(img).then(function (dataUrl) {
+                try {
+                  if (!isExtensionContextValid()) return;
+                  img.src = dataUrl;
+                  img.setAttribute('data-face-blur-done', '1');
+                } catch (e) {}
+              }).catch(function () { }).then(resolve);
+            } catch (e) {
+              resolve();
+            }
+          }
+        });
+      } catch (e) {
+        resolve();
+        return;
+      }
+      if (sent && typeof sent.then === 'function' && typeof sent.catch === 'function') {
+        sent.catch(function () { resolve(); });
+      }
     });
   }
 
   function run() {
+    if (!isExtensionContextValid()) return;
     var images = Array.prototype.filter.call(
       document.querySelectorAll('img'),
       function (img) {
@@ -60,7 +93,7 @@
 
     var chain = Promise.resolve();
     for (var i = 0; i < images.length; i++) {
-      chain = chain.then(processOneImage.bind(null, images[i]));
+      chain = chain.then(processOneImage.bind(null, images[i])).catch(function () {});
     }
   }
 
